@@ -20,25 +20,42 @@ public class Paddle : MonoBehaviour
 
     void Update()
     {
-        //Controller();
-        _verticalMovement = Input.GetAxis("Vertical" + playerIndex);
-        _rb.velocity = new Vector2(0, _verticalMovement * _speed);
+        Controller();
+        //_verticalMovement = Input.GetAxis("Vertical" + playerIndex);
+        //_rb.velocity = new Vector2(0, _verticalMovement * _speed);
     }
 
-    //void Controller()
-    //{
-    //    if (Input.GetMouseButton(0))
-    //    {
-    //        Vector2 relativeMousePostion = new Vector2(Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height);
+    void Controller()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            Vector2 relativeMousePostion = new Vector2(Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height);
 
-    //        if(relativeMousePostion.y < 0.5f)
-    //            _rb.velocity = new Vector2(0,-_speed);
-    //        if (relativeMousePostion.y > 0.5f)
-    //            _rb.velocity = new Vector2(0, _speed);
-    //    }
-    //    else
-    //    {
-    //        _rb.velocity = Vector2.zero;
-    //    }
-    //}
+            if (playerIndex == 2)
+            {
+                if (relativeMousePostion.x > 0.5f)
+                {
+                    if (relativeMousePostion.y < 0.5f)
+                        _rb.velocity = new Vector2(0, -_speed);
+                    if (relativeMousePostion.y > 0.5f)
+                        _rb.velocity = new Vector2(0, _speed);
+                }
+            }
+
+            if (playerIndex == 1)
+            {
+                if (relativeMousePostion.x < 0.5f)
+                {
+                    if (relativeMousePostion.y < 0.5f)
+                        _rb.velocity = new Vector2(0, -_speed);
+                    if (relativeMousePostion.y > 0.5f)
+                        _rb.velocity = new Vector2(0, _speed);
+                }
+            }
+        }
+        else
+        {
+            _rb.velocity = Vector2.zero;
+        }
+    }
 }
