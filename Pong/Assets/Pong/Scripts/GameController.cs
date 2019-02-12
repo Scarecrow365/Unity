@@ -8,11 +8,13 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private GameObject _ballPrefab;
     [SerializeField]
+    private Text _gameOver;
+    [SerializeField]
     private Text _score1;
     [SerializeField]
     private Text _score2;
     [SerializeField]
-    private float _BallBound = 7.4f;
+    private float _BallBound = 8.4f;
 
     private Ball _ball;
     private int score1;
@@ -41,6 +43,7 @@ public class GameController : MonoBehaviour
                 SpawnBall();
 	        }
 	    }
+        GameOver();
 	}
 
     void SpawnBall()
@@ -52,5 +55,13 @@ public class GameController : MonoBehaviour
 
         _score1.text = score1.ToString();
         _score2.text = score2.ToString();
+    }
+
+    void GameOver()
+    {
+        if (score1 >= 5 || score2 >= 5)
+        {
+            
+        }
     }
 }

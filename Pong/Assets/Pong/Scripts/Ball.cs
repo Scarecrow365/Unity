@@ -8,13 +8,13 @@ public class Ball : MonoBehaviour
     private float _difficult = 1.1f;
 
     [SerializeField]
-    private float _speedMinX = 0.8f;
+    private float _speedMinX = 1.5f;
     [SerializeField]
-    private float _speedMaxX = 1.2f;
+    private float _speedMaxX = 2.0f;
     [SerializeField]
-    private float _speedMinY = 0.8f;
+    private float _speedMinY = 1.5f;
     [SerializeField]
-    private float _speedMaxY = 1.2f;
+    private float _speedMaxY = 2.0f;
 
     private Rigidbody2D _rb;
 
