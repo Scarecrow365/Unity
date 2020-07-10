@@ -1,35 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
-    float _speed;
-    [SerializeField] private float _verticalSpeed;
-    private Rigidbody2D _rb;
+    [SerializeField] [Range(1, 3)] private float _speed = 1;
+    private const float BorderY = 3.8f;
 
-    void Start()
+    public void MoveUp(Rigidbody2D rigidbody)
     {
-        _rb = GetComponent<Rigidbody2D>();
+        if (rigidbody.gameObject.transform.position.y > BorderY)
+        {
+            Stop(rigidbody);
+            return;
+        }
+
+        rigidbody.velocity = new Vector2(0, _speed);
     }
 
-    public void Up()
+    public void MoveDown(Rigidbody2D rigidbody)
     {
-        _speed = _verticalSpeed;
+        if (rigidbody.gameObject.transform.position.y < -BorderY)
+        {
+            Stop(rigidbody);
+            return;
+        }
+
+        rigidbody.velocity = new Vector2(0, -_speed);
     }
 
-    public void Down()
+    public void Stop(Rigidbody2D rigidbody)
     {
-        _speed = -_verticalSpeed;
-    }
-
-    public void Stop()
-    {
-        _speed = 0;
-    }
-
-    void Update()
-    {
-        _rb.velocity = new Vector2(0,_speed);
+        rigidbody.velocity = new Vector2(0, 0);
     }
 }

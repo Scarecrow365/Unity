@@ -1,56 +1,100 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    [SerializeField]
-    private float _difficult = 1.1f;
+    [SerializeField] private float _speedFactor;
+    [SerializeField] private GameData _gameData;
+    [SerializeField] private ParticleSystem _particleSystem;
+    [Header("Max Speed")]
+    [SerializeField] private float _speedMaxX;
+    [SerializeField] private float _speedMaxY;
+    [Header("Min Speed")]
+    [SerializeField] private float _speedMinX;
+    [SerializeField] private float _speedMinY;
+    private const float Percent = 0.01f;
+    private const float BorderY = 4.3f;
+    private float _borderX;
+    private Rigidbody2D _rigidbody;
+    private AudioSource _audioSource;
 
-    [SerializeField]
-    private float _speedMinX = 1.5f;
-    [SerializeField]
-    private float _speedMaxX = 2.0f;
-    [SerializeField]
-    private float _speedMinY = 1.5f;
-    [SerializeField]
-    private float _speedMaxY = 2.0f;
-
-    private Rigidbody2D _rb;
-
-    void Start()
+    private void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        _rb.velocity = new Vector2(Random.Range(_speedMinX,_speedMaxX) * (Random.value>0.5f ? -1 : 1),
-                                   Random.Range(_speedMinY,_speedMaxY) * (Random.value>0.5f ? -1 : 1));
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
+        _borderX = Screen.width * Percent;
     }
 
-    void OnTriggerEnter2D(Collider2D col)
+    private void Start()
     {
-        
-        if (col.tag == "Bound")
-        {
-            GetComponent<AudioSource>().Play();
-            //Ограничение сверху
-            if (col.transform.position.y> transform.position.y && _rb.velocity.y > 0)
-                _rb.velocity = new Vector2(_rb.velocity.x,-_rb.velocity.y);
+        CreateDirection();
+    }
 
-            //Ограние снизу
-            if (col.transform.position.y < transform.position.y && _rb.velocity.y < 0)
-                _rb.velocity = new Vector2(_rb.velocity.x, -_rb.velocity.y);
-            
+    private void Update()
+    {
+        CheckBorders();
+    }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (!col.CompareTag("Paddle")) return;
+        _audioSource.Play();
+        _rigidbody.velocity =
+            new Vector2(
+                (_rigidbody.velocity.x * -1) * _speedFactor, 
+                _rigidbody.velocity.y * _speedFactor);
+    }
+
+    private void CreateDirection()
+    {
+        _rigidbody.velocity = new Vector2(
+            Random.Range(_speedMinX, _speedMaxX) * (Random.value > 0.5f ? -1 : 1),
+            Random.Range(_speedMinY, _speedMaxY) * (Random.value > 0.5f ? -1 : 1));
+    }
+
+    private void ResetBall()
+    {
+        transform.position = Vector3.zero;
+        CreateDirection();
+    }
+
+    private void CheckBorders()
+    {
+        //Ограничение сверху
+        if (BorderY < transform.position.y && _rigidbody.velocity.y > 0)
+        {
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, -_rigidbody.velocity.y);
+            _audioSource.Play();
+            _particleSystem.gameObject.transform.position = transform.position;
+            _particleSystem.Play();
         }
 
-        else if (col.tag == "Paddle")
+        //Ограничение снизу
+        if (-BorderY > transform.position.y && _rigidbody.velocity.y < 0)
         {
-            GetComponent<AudioSource>().Play();
-            //Ограничение слева
-            if(col.transform.position.x < transform.position.x && _rb.velocity.x < 0)
-                _rb.velocity = new Vector2(-_rb.velocity.x * _difficult, _rb.velocity.y * _difficult);
+            _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, -_rigidbody.velocity.y);
+            _audioSource.Play();
+            _particleSystem.gameObject.transform.position = transform.position;
+            _particleSystem.Play();
+        }
 
-            //Ограничение справа
-            if (col.transform.position.x > transform.position.x && _rb.velocity.x > 0)
-                _rb.velocity = new Vector2(-_rb.velocity.x * _difficult, _rb.velocity.y * _difficult);
+        //Ограничение слева
+        if (-_borderX > transform.position.x)
+        {
+            _gameData.CurrentScorePlayer2++;
+            if (_gameData.CurrentScorePlayer2 >= 5)
+                _gameData.ResetAllScore();
+            
+            ResetBall();
+        }
+
+        //Ограничение справа
+        else if (_borderX < transform.position.x)
+        {
+            _gameData.CurrentScorePlayer1++;
+            if (_gameData.CurrentScorePlayer1 >= 5)
+                _gameData.ResetAllScore();
+            
+            ResetBall();
         }
     }
 }
